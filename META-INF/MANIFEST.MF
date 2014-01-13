@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Modelsolver
+Bundle-SymbolicName: com.github.markyc.modelsolver
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: com.github.markyc.modelsolver.Activator
+Bundle-Vendor: GITHUB
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Import-Package: com.github.markyc.stat.service,
+ org.osgi.framework;version="1.3.0"
