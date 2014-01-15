@@ -61,34 +61,13 @@ public class ProcessPanel {
 		
 		this.processes = createProcessList(userProcesses);
 		
-		JButton btn = new JButton(ADD);
+		/*JButton btn = new JButton(ADD);
 		btn.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				
-				UserProcess p1;
-				try
-			      {
-			         FileInputStream fileIn = new FileInputStream(new File("UserProcess.txt"));
-			         ObjectInputStream in = new ObjectInputStream(fileIn);
-			         p1 = (UserProcess) in.readObject();
-			         in.close();
-			         fileIn.close();
-			      }catch(IOException i)
-			      {
-			         i.printStackTrace();
-			         return;
-			      }catch(ClassNotFoundException c)
-			      {
-			         System.out.println("Employee class not found");
-			         c.printStackTrace();
-			         return;
-			      }
-				
-				System.out.println(p1.getName()+ " " + p1.getPid() + " " + p1.getResolution() + " " + p1.isCpuMonitored());
 			}
-		});
+		});*/
 		
 		JScrollPane scrollableProcessList = new JScrollPane();
 		scrollableProcessList.setViewportView(processes);
@@ -104,7 +83,7 @@ public class ProcessPanel {
 		JPanel right = new JPanel();
 		right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
 		right.add(monitorPanel);
-		right.add(btn);
+		//right.add(btn);
 		
 		// Main container
 		this.panel = new JPanel(); 		
