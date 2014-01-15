@@ -20,7 +20,7 @@ public class ModelPanel {
 	private JPanel panel;
 	private JPanel models;
 	
-	public static final String PATH = "C:\\Users\\Marco\\workspace\\com.github.markyc.modelsolver\\model"; 
+	public static final String PATH = "C:\\Users\\Marco\\Documents\\GitHub\\ModelSolver\\model"; 
 	
 	public static final String TITLE = "Models";
 	public static final String ADD = "Add Model";

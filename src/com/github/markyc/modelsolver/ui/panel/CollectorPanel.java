@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -20,7 +21,7 @@ public class CollectorPanel {
 	private JPanel panel;
 	private JPanel collectors;
 	
-	public static final String PATH = "C:\\Users\\Marco\\workspace\\com.github.markyc.modelsolver\\collector"; 
+	public static final String PATH = "C:\\Users\\Marco\\Documents\\GitHub\\ModelSolver\\collector"; 
 	
 	public static final String TITLE = "Collectors";
 	public static final String ADD = "Add Collector";
@@ -57,8 +58,10 @@ public class CollectorPanel {
 			}
 		});
 		
+		panel.add(Box.createHorizontalGlue());
 		panel.add(collectors);
 		panel.add(addButon);
+		panel.add(Box.createHorizontalGlue());
 	}
 	
 	public void addCollectorRow(final File f) {
@@ -84,7 +87,6 @@ public class CollectorPanel {
 	}
 
 	public static CollectorPanel newInstance() {
-		
 		return new CollectorPanel();
 	}
 	

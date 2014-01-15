@@ -14,6 +14,7 @@ import javax.swing.UIManager;
 
 import com.github.markyc.modelsolver.ui.panel.CollectorPanel;
 import com.github.markyc.modelsolver.ui.panel.ModelPanel;
+import com.github.markyc.modelsolver.ui.panel.ProcessPanel;
 import com.github.markyc.modelsolver.ui.panel.ResultPanel;
 
 public class MainWindow {
@@ -29,6 +30,7 @@ public class MainWindow {
 	private CollectorPanel collectorPanel;
 	private ModelPanel modelPanel;
 	private ResultPanel resultPanel;
+	private ProcessPanel processPanel;
 	
 	/**
 	 * @return the window
@@ -119,12 +121,14 @@ public class MainWindow {
 	private JPanel createBody() {
 		JPanel body = new JPanel();
 		
-		body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
+		body.setLayout(new BoxLayout(body, BoxLayout.X_AXIS));
 		
+		processPanel	= ProcessPanel.newInstance();
 		collectorPanel 	= CollectorPanel.newInstance();
 		modelPanel 		= ModelPanel.newInstance();
 		resultPanel 	= ResultPanel.newInstance();
 		
+		body.add(processPanel.getPanel());
 		body.add(collectorPanel.getPanel());
 		body.add(modelPanel.getPanel());
 		body.add(resultPanel.getPanel());
