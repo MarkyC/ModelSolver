@@ -3,19 +3,28 @@
  */
 package com.github.markyc.modelsolver.model;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
 /**
  * @author Marco
  *
  */
-public class UserProcess implements Comparable<UserProcess> {
+public class UserProcess implements Comparable<UserProcess>, Serializable {
 	
-
+	private static final long serialVersionUID = -3081338408878150273L;
+	
 	String name;
 	int pid;
 	boolean cpuMonitored;
 	boolean memoryMonitored;
 	boolean diskMonitored;
-	short resolution;		// in seconds, for now
+	int resolution;		// in seconds, for now
 	
 	private static final short DEFAULT_RESOLUTION = 5;
 	
@@ -37,7 +46,7 @@ public class UserProcess implements Comparable<UserProcess> {
 	 * @param resolution (in seconds)
 	 */
 	public UserProcess(String name, int pid, boolean cpuMonitored,
-			boolean memoryMonitored, boolean diskMonitored, short resolution) {
+			boolean memoryMonitored, boolean diskMonitored, int resolution) {
 		super();
 		this.name = name;
 		this.pid = pid;
@@ -73,6 +82,10 @@ public class UserProcess implements Comparable<UserProcess> {
 	 */
 	public void setPid(int pid) {
 		this.pid = pid;
+	}
+	
+	public boolean isMonitored() {
+		return isCpuMonitored() || isMemoryMonitored() || isDiskMonitored();
 	}
 
 	/**
@@ -120,20 +133,45 @@ public class UserProcess implements Comparable<UserProcess> {
 	/**
 	 * @return the resolution
 	 */
-	public short getResolution() {
+	public int getResolution() {
 		return resolution;
 	}
 
 	/**
 	 * @param resolution the resolution to set
 	 */
-	public void setResolution(short resolution) {
+	public void setResolution(int resolution) {
 		this.resolution = resolution;
 	}
 
 	@Override
 	public int compareTo(UserProcess p) {
         return getName().compareTo(p.getName());
+	}
+	
+	public void serialize(File file) throws IOException{
+		
+		FileOutputStream fileOut = new FileOutputStream(file);
+		ObjectOutputStream out = new ObjectOutputStream(fileOut);
+		out.writeObject(this);
+
+		out.close();
+    	fileOut.close();
+		
+	}
+	
+	public UserProcess deserialize(File file) throws IOException, ClassNotFoundException {
+		
+
+		FileInputStream fileIn = new FileInputStream(file);
+		ObjectInputStream in = new ObjectInputStream(fileIn);
+		 
+		UserProcess p = (UserProcess) in.readObject();
+		 
+		in.close();
+		fileIn.close();
+		return p;
+		
 	}
 
 }
