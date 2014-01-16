@@ -8,29 +8,25 @@ import javax.swing.SwingUtilities;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 
 import com.github.markyc.modelsolver.ui.MainWindow;
-import com.github.markyc.stat.service.StatService;
+import com.github.markyc.modelsolver.util.Util;
 
 public class Activator implements BundleActivator {
 	
-    ServiceReference<?> statServiceReference;
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
+		
+		Util.setBundleContext(context);
+		
 		SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 createAndShowGUI();
             }
         });
-		
-		statServiceReference= context.getServiceReference(StatService.class.getName());
-        StatService statService = (StatService) context.getService(statServiceReference);
-        System.out.println(statService.getStats());
 	}
 	
 	/*

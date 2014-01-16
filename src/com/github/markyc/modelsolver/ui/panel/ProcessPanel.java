@@ -8,10 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.Arrays;
 
 import javax.swing.BorderFactory;
@@ -29,8 +26,13 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import com.github.markyc.modelsolver.model.UserProcess;
+import name.github.markyc.userprocess.UserProcess;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+
 import com.github.markyc.modelsolver.util.Util;
+import com.github.markyc.stat.service.StatService;
 
 public class ProcessPanel {
 
@@ -38,10 +40,12 @@ public class ProcessPanel {
 	public static final String ADD = "Specify Process";
 	public static final String SELECT = "Select a process from the list.";
 	
-	public static final String CPU 			= "CPU";
-	public static final String MEMORY 		= "Memory";
-	public static final String DISK			= "Disk IO";
-	public static final String RESOLUTION 	= " Resolution: ";
+	public static final String CPU 				= "CPU";
+	public static final String MEMORY 			= "Memory";
+	public static final String DISK				= "Disk IO";
+	public static final String RESOLUTION 		= " Resolution: ";
+	public static final String START_COLLECTION	= "Start Collection";
+	public static final String STOP_COLLECTION	= "Stop Collection";
 	
 	private static final int MAX_COMPONENT_HEIGHT = 25;
 	private static final Dimension LIST_SIZE = new Dimension(300, 200);
@@ -51,6 +55,15 @@ public class ProcessPanel {
 	private JPanel monitorPanel;
 	
 	JList<UserProcess> processes;
+	
+
+	public static ProcessPanel newInstance() {
+		return new ProcessPanel();
+	}
+	
+	public JPanel getPanel() {
+		return this.panel;
+	}
 	
 	private ProcessPanel() {
 		
@@ -130,10 +143,6 @@ public class ProcessPanel {
 				
 				// Show the card belonging to this UserProcess
 				((CardLayout) monitorPanel.getLayout()).show(monitorPanel, p.toString()); // TODO: don't use toString
-				
-				/*monitorPanel = createMonitorPanel(p);
-				panel.revalidate();
-				panel.repaint();*/
 			}
 			
 		});
@@ -148,7 +157,7 @@ public class ProcessPanel {
 		result.add(createEmptyMonitorPanel());
 		
 		for (UserProcess p : userProcesses) {
-			result.add(createMonitorPanelForProcess(p), p.toString()); // TODO: don't user toString
+			result.add(createMonitorPanelForProcess(p), p.toString()); // TODO: don't use toString
 		}
 		return result;
 		
@@ -166,58 +175,91 @@ public class ProcessPanel {
 	}
 	
 	private JPanel createMonitorPanelForProcess(final UserProcess p) {
-		JPanel result = new JPanel();
-		result.setLayout(new BoxLayout(result, BoxLayout.Y_AXIS));
-		
+		// CPU
 		final JCheckBox cpu = new JCheckBox(CPU, p.isCpuMonitored());
-		cpu.addItemListener(new ItemListener() {
-			
-			@Override
-		    public void itemStateChanged(ItemEvent e) {
-				// Updates whether we are monitoring the UserProcess' CPU 
-				// based on the whether the checkbox is selected
-				p.setCpuMonitored(cpu.isSelected());
-			}
-			
-		});
+		cpu.addItemListener(createCPUItemListener(cpu, p));
 		
+		// Memory
 		final JCheckBox mem = new JCheckBox(MEMORY, p.isMemoryMonitored());
-		mem.addItemListener(new ItemListener() {
-			
-			@Override
-		    public void itemStateChanged(ItemEvent e) {
-				p.setMemoryMonitored(mem.isSelected());
-			}
-			
-		});
+		mem.addItemListener(createMemoryItemListener(mem, p));
 		
+		// Disk
 		final JCheckBox disk = new JCheckBox(DISK, p.isDiskMonitored());
-		disk.addItemListener(new ItemListener() {
+		disk.addItemListener(createDiskItemListener(disk, p));
+		
+		// Resolution
+		JPanel resolution = createResolutionPanel(p);	
+		resolution.setMaximumSize(new Dimension(resolution.getMaximumSize().width, MAX_COMPONENT_HEIGHT));
+		
+		// Start Collection
+		JButton collect = new JButton(START_COLLECTION);
+		collect.addActionListener(createCollectionActionListener(p));
 			
-			@Override
-		    public void itemStateChanged(ItemEvent e) {
-				p.setDiskMonitored(disk.isSelected());
-			}
-			
-		});
-		
-		JPanel resolution = createResolutionPanel(p);
-		
-		
+		// Align all components
 		cpu.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mem.setAlignmentX(Component.LEFT_ALIGNMENT);
 		disk.setAlignmentX(Component.LEFT_ALIGNMENT);
 		resolution.setAlignmentX(Component.LEFT_ALIGNMENT);
-		resolution.setMaximumSize(new Dimension(resolution.getMaximumSize().width, MAX_COMPONENT_HEIGHT));
+		collect.setAlignmentX(Component.LEFT_ALIGNMENT);
 		
+		
+		// Add components to JPanel
+		JPanel result = new JPanel();
+		result.setLayout(new BoxLayout(result, BoxLayout.Y_AXIS));
 		result.add(cpu);
 		result.add(mem);
 		result.add(disk);
 		result.add(resolution);
+		result.add(collect);
 		
 		return result;
 	}
 	
+	/**
+	 * Updates whether we are monitoring the UserProcess' CPU based on the whether the checkbox is selected
+	 * @param check
+	 * @param p
+	 * @return
+	 */
+	private ItemListener createCPUItemListener(final JCheckBox check, final UserProcess p) {
+		return new ItemListener() {
+			@Override
+		    public void itemStateChanged(ItemEvent e) {
+				p.setCpuMonitored(check.isSelected());
+			}
+		};
+	}
+	
+	/**
+	 * Updates whether we are monitoring the UserProcess' Memory based on the whether the checkbox is selected
+	 * @param check
+	 * @param p
+	 * @return
+	 */
+	private ItemListener createMemoryItemListener(final JCheckBox check, final UserProcess p) {
+		return new ItemListener() {
+			@Override
+		    public void itemStateChanged(ItemEvent e) {
+				p.setMemoryMonitored(check.isSelected());
+			}
+		};
+	}
+	
+	/**
+	 * Updates whether we are monitoring the UserProcess' Disk based on the whether the checkbox is selected
+	 * @param check
+	 * @param p
+	 * @return
+	 */
+	private ItemListener createDiskItemListener(final JCheckBox check, final UserProcess p) {
+		return new ItemListener() {
+			@Override
+		    public void itemStateChanged(ItemEvent e) {
+				p.setMemoryMonitored(check.isSelected());
+			}
+		};
+	}
+
 	private static JPanel createResolutionPanel(final UserProcess p) {
 		final JComboBox<String> resolution = new JComboBox<String>(new String[] {
 				"5"//, 10, 30, 60, 90
@@ -264,13 +306,24 @@ public class ProcessPanel {
 		result.add(resolutionType);
 		return result;
 	}
-
-	public static ProcessPanel newInstance() {
-		return new ProcessPanel();
-	}
 	
-	public JPanel getPanel() {
-		return this.panel;
+	private ActionListener createCollectionActionListener(final UserProcess p) {
+		return new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				BundleContext context = Util.getBundleContext();
+				
+			    ServiceReference<?> statServiceReference = context.getServiceReference(StatService.class.getName());
+		        StatService statService = (StatService) context.getService(statServiceReference);
+		        System.out.println("Collecting");
+		        try {
+					statService.createCollector(p);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		};
 	}
 
 }

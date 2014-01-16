@@ -6,9 +6,16 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.markyc.modelsolver.model.UserProcess;
+import name.github.markyc.userprocess.UserProcess;
+
+import org.osgi.framework.BundleContext;
 
 public class Util {
+
+	/**
+	 * Singleton BundleContext
+	 */
+	private static BundleContext bundleContext;
 
 	public static List<UserProcess> getProcesses() {
 		
@@ -74,5 +81,13 @@ public class Util {
 			result[i] = str[i].replaceAll("\"", "");
 		}
 		return result;
+	}
+	
+	public static BundleContext getBundleContext() {
+		return bundleContext;
+	}
+	
+	public static void setBundleContext(BundleContext c) {
+		bundleContext = c;
 	}
 }
