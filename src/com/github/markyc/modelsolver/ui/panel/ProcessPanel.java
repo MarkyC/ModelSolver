@@ -254,7 +254,7 @@ public class ProcessPanel {
 		return new ItemListener() {
 			@Override
 		    public void itemStateChanged(ItemEvent e) {
-				p.setMemoryMonitored(check.isSelected());
+				p.setDiskMonitored(check.isSelected());
 			}
 		};
 	}
