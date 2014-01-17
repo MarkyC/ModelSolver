@@ -7,6 +7,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.github.markyc.stat.service.StatCollector;
 
 /**
  * @author Marco
@@ -22,6 +26,8 @@ public class UserProcess implements Comparable<UserProcess>, Serializable {
 	boolean memoryMonitored;
 	boolean diskMonitored;
 	int resolution;		// in seconds, for now
+
+	private List<StatCollector> collectors;
 	
 	private static final short DEFAULT_RESOLUTION = 5;
 	
@@ -51,6 +57,11 @@ public class UserProcess implements Comparable<UserProcess>, Serializable {
 		this.memoryMonitored = memoryMonitored;
 		this.diskMonitored = diskMonitored;
 		this.resolution = resolution;
+		this.collectors = new ArrayList<StatCollector>();
+	}
+	
+	public void addCollector(StatCollector collector) {
+		this.collectors.add(collector);
 	}
 
 	/**

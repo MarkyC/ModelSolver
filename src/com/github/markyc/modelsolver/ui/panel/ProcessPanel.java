@@ -30,7 +30,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
 import com.github.markyc.modelsolver.model.UserProcess;
+import com.github.markyc.modelsolver.util.HelpModal;
 import com.github.markyc.modelsolver.util.Util;
+import com.github.markyc.stat.service.StatCollector;
 import com.github.markyc.stat.service.StatService;
 
 public class ProcessPanel {
@@ -310,19 +312,25 @@ public class ProcessPanel {
 		return new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent evt) {
+			
+				// Show help window
+				HelpModal.show(panel, HelpModal.RUN_AS_ADMIN);
+				
+				// Create/Start the collector
 				BundleContext context = Util.getBundleContext();
 				
 			    ServiceReference<?> statServiceReference = context.getServiceReference(StatService.class.getName());
 		        StatService statService = (StatService) context.getService(statServiceReference);
 		        try {
-		        	
-					statService.createCollector(
+					StatCollector collector = statService.createCollector(
 							p.getName(), 
 							p.getPid(), 
 							p.isCpuMonitored(), 
 							p.isMemoryMonitored(), 
 							p.isDiskMonitored(), 
 							p.getResolution());
+					
+					p.addCollector(collector);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
