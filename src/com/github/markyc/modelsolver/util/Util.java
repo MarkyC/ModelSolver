@@ -6,9 +6,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import name.github.markyc.userprocess.UserProcess;
-
 import org.osgi.framework.BundleContext;
+
+import com.github.markyc.modelsolver.model.UserProcess;
 
 public class Util {
 

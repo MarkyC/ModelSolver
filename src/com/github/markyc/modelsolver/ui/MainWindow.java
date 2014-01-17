@@ -12,8 +12,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
-import com.github.markyc.modelsolver.ui.panel.CollectorPanel;
-import com.github.markyc.modelsolver.ui.panel.ModelPanel;
 import com.github.markyc.modelsolver.ui.panel.ProcessPanel;
 import com.github.markyc.modelsolver.ui.panel.ResultPanel;
 
@@ -27,8 +25,8 @@ public class MainWindow {
 	private JFrame window;
 	
 	// This JPanel handles collection tools
-	private CollectorPanel collectorPanel;
-	private ModelPanel modelPanel;
+	//private CollectorPanel collectorPanel;
+	//private ModelPanel modelPanel;
 	private ResultPanel resultPanel;
 	private ProcessPanel processPanel;
 	
@@ -124,13 +122,13 @@ public class MainWindow {
 		body.setLayout(new BoxLayout(body, BoxLayout.X_AXIS));
 		
 		processPanel	= ProcessPanel.newInstance();
-		collectorPanel 	= CollectorPanel.newInstance();
-		modelPanel 		= ModelPanel.newInstance();
+		//collectorPanel 	= CollectorPanel.newInstance();
+		//modelPanel 		= ModelPanel.newInstance();
 		resultPanel 	= ResultPanel.newInstance();
 		
 		body.add(processPanel.getPanel());
-		body.add(collectorPanel.getPanel());
-		body.add(modelPanel.getPanel());
+		//body.add(collectorPanel.getPanel());
+		//body.add(modelPanel.getPanel());
 		body.add(resultPanel.getPanel());
 		
 		return body;

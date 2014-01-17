@@ -26,11 +26,10 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import name.github.markyc.userprocess.UserProcess;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+import com.github.markyc.modelsolver.model.UserProcess;
 import com.github.markyc.modelsolver.util.Util;
 import com.github.markyc.stat.service.StatService;
 
@@ -315,9 +314,15 @@ public class ProcessPanel {
 				
 			    ServiceReference<?> statServiceReference = context.getServiceReference(StatService.class.getName());
 		        StatService statService = (StatService) context.getService(statServiceReference);
-		        System.out.println("Collecting");
 		        try {
-					statService.createCollector(p);
+		        	
+					statService.createCollector(
+							p.getName(), 
+							p.getPid(), 
+							p.isCpuMonitored(), 
+							p.isMemoryMonitored(), 
+							p.isDiskMonitored(), 
+							p.getResolution());
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
