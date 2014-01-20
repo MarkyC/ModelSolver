@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 import com.github.markyc.modelsolver.model.UserProcess;
+import com.github.markyc.stat.service.StatService;
 
 public class Util {
 
@@ -89,5 +91,13 @@ public class Util {
 	
 	public static void setBundleContext(BundleContext c) {
 		bundleContext = c;
+	}
+	
+	public static StatService getStatService() {
+		
+		BundleContext context = Util.getBundleContext();
+		
+	    ServiceReference<?> statServiceReference = context.getServiceReference(StatService.class.getName());
+	    return (StatService) context.getService(statServiceReference);
 	}
 }

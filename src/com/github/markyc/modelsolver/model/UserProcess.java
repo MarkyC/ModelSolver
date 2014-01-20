@@ -63,6 +63,10 @@ public class UserProcess implements Comparable<UserProcess>, Serializable {
 	public void addCollector(StatCollector collector) {
 		this.collectors.add(collector);
 	}
+	
+	public List<StatCollector> getCollectors() {
+		return this.collectors;
+	}
 
 	/**
 	 * @return the name

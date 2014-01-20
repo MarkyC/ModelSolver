@@ -4,6 +4,7 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -26,9 +27,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-
 import com.github.markyc.modelsolver.model.UserProcess;
 import com.github.markyc.modelsolver.util.HelpModal;
 import com.github.markyc.modelsolver.util.Util;
@@ -45,8 +43,9 @@ public class ProcessPanel {
 	public static final String MEMORY 			= "Memory";
 	public static final String DISK				= "Disk IO";
 	public static final String RESOLUTION 		= " Resolution: ";
-	public static final String START_COLLECTION	= "Start Collection";
-	public static final String STOP_COLLECTION	= "Stop Collection";
+	public static final String CREATE_COLLECTION= "Create Collector";
+	public static final String START_COLLECTION	= "Start Collectors";
+	public static final String STOP_COLLECTION	= "Stop Collectors";
 	
 	private static final int MAX_COMPONENT_HEIGHT = 25;
 	private static final Dimension LIST_SIZE = new Dimension(300, 200);
@@ -192,16 +191,29 @@ public class ProcessPanel {
 		JPanel resolution = createResolutionPanel(p);	
 		resolution.setMaximumSize(new Dimension(resolution.getMaximumSize().width, MAX_COMPONENT_HEIGHT));
 		
-		// Start Collection
-		JButton collect = new JButton(START_COLLECTION);
-		collect.addActionListener(createCollectionActionListener(p));
+		// Create Collector
+		JButton create = new JButton(CREATE_COLLECTION);
+		create.addActionListener(createCollectorActionListener(p));
+		
+		// Start Collector
+		JButton start = new JButton(START_COLLECTION);
+		start.addActionListener(createStartActionListener(p));		
+
+		// Stop Collector
+		JButton stop = new JButton(STOP_COLLECTION);
+		stop.addActionListener(createStopActionListener(p));
+		
+		JPanel buttons = new JPanel(new GridLayout(3,1));
+		buttons.add(create);
+		buttons.add(start);
+		buttons.add(stop);
 			
 		// Align all components
 		cpu.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mem.setAlignmentX(Component.LEFT_ALIGNMENT);
 		disk.setAlignmentX(Component.LEFT_ALIGNMENT);
 		resolution.setAlignmentX(Component.LEFT_ALIGNMENT);
-		collect.setAlignmentX(Component.LEFT_ALIGNMENT);
+		buttons.setAlignmentX(Component.LEFT_ALIGNMENT);
 		
 		
 		// Add components to JPanel
@@ -211,7 +223,7 @@ public class ProcessPanel {
 		result.add(mem);
 		result.add(disk);
 		result.add(resolution);
-		result.add(collect);
+		result.add(buttons);
 		
 		return result;
 	}
@@ -308,20 +320,17 @@ public class ProcessPanel {
 		return result;
 	}
 	
-	private ActionListener createCollectionActionListener(final UserProcess p) {
+	
+	
+	private ActionListener createCollectorActionListener(final UserProcess p) {
 		return new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent evt) {
-			
-				// Show help window
-				HelpModal.show(panel, HelpModal.RUN_AS_ADMIN);
-				
-				// Create/Start the collector
-				BundleContext context = Util.getBundleContext();
-				
-			    ServiceReference<?> statServiceReference = context.getServiceReference(StatService.class.getName());
-		        StatService statService = (StatService) context.getService(statServiceReference);
+			    StatService statService = Util.getStatService();
 		        try {
+		        	// Show help window
+					HelpModal.show(panel, HelpModal.RUN_AS_ADMIN);
+					
 					StatCollector collector = statService.createCollector(
 							p.getName(), 
 							p.getPid(), 
@@ -331,11 +340,55 @@ public class ProcessPanel {
 							p.getResolution());
 					
 					p.addCollector(collector);
+					/*
+					collector.stop();
+					WatchService fileWatcher = FileSystems.getDefault().newWatchService();
+					fileWatcher. */
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
+		};
+	}
+	
+	private ActionListener createStartActionListener(final UserProcess p) {
+		return new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				// Show help window
+				HelpModal.show(panel, HelpModal.RUN_AS_ADMIN);
+				
+				for (StatCollector collector : p.getCollectors()) {
+					try {
+						collector.start();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+			
+		};
+	}
+	
+	private ActionListener createStopActionListener(final UserProcess p) {
+		return new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				// Show help window
+				HelpModal.show(panel, HelpModal.RUN_AS_ADMIN);
+				
+				for (StatCollector collector : p.getCollectors()) {
+					try {
+						collector.stop();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+			
 		};
 	}
 
